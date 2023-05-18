@@ -1,4 +1,4 @@
-import { createContext, useEffect } from "react";
+import { createContext, useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { contractAbi, contractAddress } from "../utils/connect";
 
@@ -22,6 +22,8 @@ const getSmartContract = () => {
 };
 
 export const TransactionProvider = ({ children }) => {
+  const [currentAccount, setCurrentAccount] = useState("");
+
   // metamaskウォレットと連携しているのか確認
   const checkMetamaskWolletConnected = async () => {
     if (!ethereum) return alert("メタマスクをインストールしてください");
@@ -31,11 +33,22 @@ export const TransactionProvider = ({ children }) => {
     console.log(accounts);
   };
 
+  // メタマスクウォレットと連携する関数
+  const connectWallet = async () => {
+    if (!ethereum) return alert("メタマスクをインストールしてください");
+
+    // メタマスクを持っていない場合は接続を開始する
+    const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+
+    console.log(accounts);
+    setCurrentAccount(accounts[0]);
+  };
+
   useEffect(() => {
     checkMetamaskWolletConnected();
   }, []);
   return (
-    <TransactionContext.Provider value={{ name: "shincode" }}>
+    <TransactionContext.Provider value={{ connectWallet }}>
       {children}
     </TransactionContext.Provider>
   );
