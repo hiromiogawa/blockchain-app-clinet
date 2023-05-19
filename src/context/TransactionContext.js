@@ -51,14 +51,37 @@ export const TransactionProvider = ({ children }) => {
     // メタマスクを持っていない場合は接続を開始する
     const accounts = await ethereum.request({ method: "eth_requestAccounts" });
 
-    console.log(accounts);
     setCurrentAccount(accounts[0]);
   };
 
   // 実際に通貨のやり取りを行う
   const sendTransaction = async () => {
     if (!ethereum) return alert("メタマスクをインストールしてください");
-    console.log("hoge");
+    const { addressTo, amount } = inputFormData;
+    const transactionContract = getSmartContract();
+
+    // 通貨を適切な形に変換している
+    const parsedAmount = ethers.utils.parseEther(amount);
+
+    const transactionParameters = {
+      gas: "0x2710",
+      to: addressTo,
+      from: currentAccount,
+      value: parsedAmount._hex, // 16進数に変換している
+    };
+
+    const txHash = await ethereum.request({
+      method: "eth_sendTransaction",
+      params: [transactionParameters],
+    });
+
+    const transactionHash = await transactionContract.addToBlockChain(
+      addressTo,
+      parsedAmount
+    );
+    console.log(`ロード中 ${transactionHash.hash}`);
+    await transactionHash.wait();
+    console.log(`送金に成功 ${transactionHash.hash}`);
   };
 
   useEffect(() => {
