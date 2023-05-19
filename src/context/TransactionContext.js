@@ -23,6 +23,17 @@ const getSmartContract = () => {
 
 export const TransactionProvider = ({ children }) => {
   const [currentAccount, setCurrentAccount] = useState("");
+  const [inputFormData, setInputFromData] = useState({
+    addressTo: "",
+    amount: "",
+  });
+
+  const handleChange = (e, name) => {
+    setInputFromData((prevInputFormData) => ({
+      ...prevInputFormData,
+      [name]: e.target.value,
+    }));
+  };
 
   // metamaskウォレットと連携しているのか確認
   const checkMetamaskWolletConnected = async () => {
@@ -44,11 +55,19 @@ export const TransactionProvider = ({ children }) => {
     setCurrentAccount(accounts[0]);
   };
 
+  // 実際に通貨のやり取りを行う
+  const sendTransaction = async () => {
+    if (!ethereum) return alert("メタマスクをインストールしてください");
+    console.log("hoge");
+  };
+
   useEffect(() => {
     checkMetamaskWolletConnected();
   }, []);
   return (
-    <TransactionContext.Provider value={{ connectWallet }}>
+    <TransactionContext.Provider
+      value={{ connectWallet, sendTransaction, handleChange, inputFormData }}
+    >
       {children}
     </TransactionContext.Provider>
   );
