@@ -6,7 +6,8 @@ const Main = () => {
     useContext(TransactionContext);
 
   const handleSubmit = () => {
-    console.log(inputFormData);
+    const { addressTo, amount } = inputFormData;
+    if (addressTo === "" || amount === "") return;
     sendTransaction();
   };
   return (
@@ -26,14 +27,14 @@ const Main = () => {
           type="text"
           placeholder="アドレス"
           name="addressTo"
-          onChange={handleChange}
+          onChange={(e) => handleChange(e, "addressTo")}
         />
         <input
           type="number"
           step="0.0001"
           placeholder="通貨(ETH)"
           name="amount"
-          onChange={handleChange}
+          onChange={(e) => handleChange(e, "amount")}
         />
         <button type="button" onClick={handleSubmit}>
           送信
